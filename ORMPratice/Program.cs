@@ -8,39 +8,11 @@ namespace ORMPratice
         static void Main(string[] args)
         {
             var context = new Contexts.UniversityDb();
+            //context.Database.Migrate(); => This line is used to apply any pending migrations to the database. It ensures that the database schema is up-to-date with the current model defined in the code. If there are any migrations that have not been applied yet, this method will execute them and update the database accordingly.
+
             bool isConnected = context.Database.CanConnect();
             if(isConnected)
             {
-                Student student = new Student()
-                {
-                    Name = "John",
-                    Surname = "Doe",
-                    Email = "aasa@gmail.com",
-                    BirthDate = new DateTime(1990, 1, 1)
-                };
-                //context.Add(student);
-                //context.SaveChanges
-                //List<Student> allStudents = context.Students.ToList();
-                //foreach (var item in allStudents)
-                //{
-                //    Console.WriteLine($"{item.Name} {item.Surname} - {item.Email} - {item.BirthDate}");
-                //}
-                //Console.WriteLine("Enter ID : ");
-                //var id = Convert.ToInt32(Console.ReadLine());
-                //var student1 = context.Students.Find(id);
-                //Console.WriteLine($"{student1.Name} {student1.Surname} - {student1.Email} - {student1.BirthDate}");
-
-                //Student UpStu = context.Students.Find(1);
-
-                //UpStu.Surname = "UpdatedSurname";
-                //UpStu.Email = "qwqewq";
-                //context.SaveChanges();
-
-                Student studentToDelete = context.Students.Find(1004);
-
-                context.Students.Remove(studentToDelete);
-                context.SaveChanges();
-
                 Console.WriteLine("Database connection successful.");
             }
             else
