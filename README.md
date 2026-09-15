@@ -1,47 +1,132 @@
-# ORMPratice
+# ORMPratice - Universitet İdarəetmə Sistemi
 
-Simple .NET 10 console project demonstrating Entity Framework Core usage with models for `Student` and `Group` and a `DbContext` implementation.
+Entity Framework Core (.NET 10) istifadə edərək hazırlanmış Universitet
+İdarəetmə Sistemi (Console Application). Proqram tələbələrin və
+qrupların idarə edilməsi, One-to-Many əlaqələri və tam CRUD
+əməliyyatlarını təmin edir.
 
-## Project layout
-- `Program.cs` — app entry; creates `UniversityDb` and checks DB connection.
-- `Contexts/UniversityDb.cs` — EF Core `DbContext`. Currently contains an inline connection string.
-- `Entities/Student.cs` — `Student` entity.
-- `Entities/Group.cs` — `Group` entity.
+------------------------------------------------------------------------
 
-## Requirements
-- .NET 10 SDK
-- EF Core packages used by the project (check `*.csproj`): at minimum `Microsoft.EntityFrameworkCore` and provider `Microsoft.EntityFrameworkCore.SqlServer`.
-- (Optional) `dotnet-ef` global tool for migrations: `dotnet tool install --global dotnet-ef`
+## 🚀 Əsas Xüsusiyyətlər və Həllər
 
-## Quick setup
-1. Restore and build:
-   - dotnet restore
-   - dotnet build
+-   **UTF-8 Dəstəyi:** Konsol interfeysində Azərbaycan şriftlərinin
+    (`ə`, `ö`, `ğ`, `ş`, `ç`, `ı`) problemsiz göstərilməsi üçün
+    `Console.OutputEncoding = System.Text.Encoding.UTF8;` istifadə
+    edilib.
+-   **Eager Loading (Tənbəl yükləmənin qarşısının alınması):**
+    Tələbələrin aid olduğu qrup adlarının boş (`null`) gəlməməsi üçün
+    LINQ sorğularında `.Include(s => s.Group)` istifadə olunub.
+-   **Data Bütövlüyü (Check Constraint):** EF Core 7+ standartlarına
+    uyğun olaraq qrup limiti üçün konfiqurasiya
+    `builder.ToTable(t => t.HasCheckConstraint("CK_Group_Limit", "[Limit] > 0"));`
+    şəklində yazılıb.
+-   **Avtomatik Baza Qurulumu:** Proqram işə düşdükdə
+    `context.Database.Migrate()` işləyir və miqrasiyaları avtomatik
+    tətbiq edərək SQL Server-də verilənlər bazasını yaradır.
 
-2. Configure the database connection:
-   - `Contexts/UniversityDb.cs` currently contains an inline connection string:
-     `Data Source=JUPITER06\MAIN;Database=University;Integrated Security=True;...`
-   - Recommended: move the connection string to `appsettings.json` or use an environment variable and update `UniversityDb` to load it (for production and git safety).
+------------------------------------------------------------------------
 
-3. Create and apply migrations (if you need to create schema from the model):
-   - Add migration:
-     - `dotnet ef migrations add InitialCreate`
-   - Apply migration:
-     - `dotnet ef database update`
-   - Note: `Program.cs` includes a commented `context.Database.Migrate();` line — you can enable it to apply migrations at runtime.
+## 🛠 Tələblər
 
-4. Run the app:
-   - `dotnet run`
-   - The app only checks DB connectivity and prints success/failure.
+-   **Microsoft Visual Studio IDE** (Tam versiya)
+-   **.NET 10 SDK**
+-   **C# 14**
+-   **SQL Server**
 
-## Entities overview
-- `Student`
-  - `Id`, `Name`, `Surname`, `Email`, `BirthDate`, `GroupId`, `Group` (navigation)
-- `Group`
-  - `Id`, `Name`, `Limit`, `Students` (collection navigation)
+------------------------------------------------------------------------
 
-## Notes & recommendations
-- Do not keep production connection strings in source control. Prefer `appsettings.json` (excluded from git if needed), user secrets, or environment variables.
-- Consider making `UniversityDb` accept `DbContextOptions<UniversityDb>` and register it with DI for flexibility and easier testing.
-- Add `Microsoft.EntityFrameworkCore.Design` to the project if you use migrations.
-- If you need help migrating the inline connection string to configuration, tell me and I can provide the exact code changes.
+## ⚙️ Quraşdırma və İşə Salma
+
+### 1. Layihəni Açın
+
+Qovluqdakı `ORMPratice.sln` faylını **Microsoft Visual Studio**
+vasitəsilə açın.
+
+### 2. Bağlantı Ayarları (Connection String)
+
+`Contexts/UniversityDb.cs` faylına daxil olub server adınızı təyin edin:
+
+``` csharp
+var connectionString = "Data Source=YOUR_SERVER_NAME;Database=University;Integrated Security=True;TrustServerCertificate=True;";
+```
+
+### 3. Miqrasiya Yaratmaq (Package Manager Console)
+
+Visual Studio-da **Package Manager Console** pəncərəsində bu əmri icra
+edin:
+
+``` powershell
+Add-Migration InitialCreate
+```
+
+### 4. Proqramı Başlatmaq
+
+Klaviaturada **F5** (Start Debugging) düyməsini sıxaraq proqramı işə
+salın. Proqram avtomatik olaraq `University` bazasını yaradacaq.
+
+------------------------------------------------------------------------
+
+## 📊 Verilənlər Bazası Arxitekturası
+
+### Group (Qruplar)
+
+  **Sahə**   **Tip**    **Təsvir**
+  ---------- ---------- ---------------------------------------
+  `Id`       `int`      Primary Key
+  `Name`     `string`   Qrup adı (Max 100)
+  `Limit`    `int`      Tələbə limiti (Mütləq \> 0 olmalıdır)
+
+### Student (Tələbələr)
+
+  **Sahə**    **Tip**    **Təsvir**
+  ----------- ---------- ----------------------------------------
+  `Id`        `int`      Primary Key
+  `Name`      `string`   Ad (Max 50)
+  `Surname`   `string`   Soyad (Max 50)
+  `Email`     `string`   E-poçt (Max 100)
+  `GroupId`   `int`      Foreign Key (Group cədvəlinə bağlıdır)
+
+------------------------------------------------------------------------
+
+## 💻 Konsol Menyuları
+
+Proqram işə salındıqda aşağıdakı struktura uyğun menyular açılır:
+
+### Ana Menyu
+
+``` text
+=== UNİVERSİTET İDARƏETMƏ SİSTEMİ ===
+1. Qrupları idarə et
+2. Tələbələri idarə et
+0. Çıxış
+Seçiminizi edin:
+```
+
+### Qrup Menyusu (1)
+
+``` text
+--- QRUP MENYUSU ---
+1. Qrup əlavə et
+2. Qrupa düzəliş et
+3. Qrupu sil
+4. Bütün qruplara bax
+5. ID-yə görə qrup axtar
+6. Ada görə qrup axtar
+7. Qrupdakı tələbələrə bax
+0. Ana menyuya qayıt
+Seçiminizi edin:
+```
+
+### Tələbə Menyusu (2)
+
+``` text
+--- TƏLƏBƏ MENYUSU ---
+1. Tələbə əlavə et
+2. Tələbəyə düzəliş et
+3. Tələbəni sil
+4. Bütün tələbələrə bax
+5. ID-yə görə tələbə axtar
+6. Ada görə tələbə axtar
+0. Ana menyuya qayıt
+Seçiminizi edin:
+```
